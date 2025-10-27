@@ -4,6 +4,9 @@ A simple, lightweight JavaScript library for generating tones, melodies, and ala
 
 **Note:** This library was made for fun and to test/play with the Web Audio API.
 
+## 🎧 Live Demo
+[View the Live Demo](https://sandbox.simonringwelski.dk/tone_lib/index.html)
+
 ## Features
 
 - **UI Sounds** - Quick feedback sounds for user interactions (ping, bell, success, error, etc.)
@@ -148,3 +151,4 @@ ToneLib uses the Web Audio API and works in all modern browsers:
 - Firefox (latest)
 - Safari (latest)
 - Opera (latest)
+
