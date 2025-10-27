@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToneLib Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', 'Consolas', monospace;
+            background: #000;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            min-height: 100vh;
+            padding: 20px;
+            color: #0f0;
+            overflow-x: auto;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 5px;
+            font-size: 2.5em;
+            text-shadow: 0 0 10px #0f0;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 3px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+            font-family: 'Courier New', monospace;
+        }
+
+        .sections {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .section {
+            background: rgba(10, 10, 10, 0.9);
+            border: 1px solid #333;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .section:hover {
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+            border-color: #0f0;
+        }
+
+        .section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #0f0, transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .section:hover::before {
+            opacity: 1;
+        }
+
+        .section h2 {
+            color: #0f0;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            font-family: 'Courier New', monospace;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border: 1px solid #333;
+            border-radius: 0;
+            font-size: 0.85em;
+            font-weight: normal;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover {
+            border-color: #0f0;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+            color: #0f0;
+        }
+
+        .btn:active {
+            background: #0f0;
+            color: #000;
+        }
+
+        .btn::before {
+            content: '▶';
+            position: absolute;
+            left: -20px;
+            transition: left 0.2s ease;
+        }
+
+        .btn:hover::before {
+            left: 5px;
+        }
+
+        /* UI Sounds */
+        .ui-sound { 
+            background: #0a0a0a;
+            border-color: #555;
+        }
+
+        /* Melodies */
+        .melody { 
+            background: #0a0a0a;
+            border-color: #555;
+        }
+
+        /* Alarms */
+        .alarm-btn { 
+            background: #0a0a0a;
+            border-color: #555;
+            margin-bottom: 5px;
+        }
+
+        .stop-alarm {
+            background: #1a0a0a;
+            border-color: #a00;
+            grid-column: 1 / -1;
+            margin-top: 8px;
+            color: #f55;
+        }
+
+        .stop-alarm:hover {
+            border-color: #f00;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            color: #f00;
+        }
+
+        .desc {
+            font-size: 0.75em;
+            color: #666;
+            margin-bottom: 15px;
+            font-style: normal;
+            font-family: 'Courier New', monospace;
+        }
+
+        .alarm-controls {
+            background: #050505;
+            padding: 15px;
+            border: 1px solid #222;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .alarm-controls select, .alarm-controls input {
+            padding: 8px;
+            border: 1px solid #333;
+            background: #0a0a0a;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            margin: 5px 0;
+            width: 100%;
+        }
+
+        .alarm-controls select:focus, .alarm-controls input:focus {
+            outline: 1px solid #0f0;
+            box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+        }
+
+        .alarm-controls label {
+            font-size: 0.75em;
+            font-weight: normal;
+            color: #888;
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .alarm-controls input[type="range"] {
+            -webkit-appearance: none;
+            height: 2px;
+            background: #333;
+        }
+
+        .alarm-controls input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            background: #0f0;
+            cursor: pointer;
+        }
+
+        .alarm-controls input[type="range"]::-moz-range-thumb {
+            width: 12px;
+            height: 12px;
+            background: #0f0;
+            cursor: pointer;
+            border: none;
+        }
+
+        .quick-test {
+            background: rgba(10, 10, 10, 0.9);
+            border: 1px solid #333;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+        }
+
+        .quick-test h2 {
+            color: #0f0;
+            margin-bottom: 15px;
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .test-btn {
+            background: #0a0a0a;
+            border: 1px solid #555;
+            width: 100%;
+            color: #0f0;
+        }
+
+        #volumeDisplay {
+            color: #0f0;
+            margin-left: 10px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ToneLib Demo</h1>
+        <p class="subtitle">[Interactive demonstration of the Simple Tone Library]</p>
+
+        <div class="sections">
+            <!-- UI Sounds Section -->
+            <div class="section">
+                <h2>UI Sounds</h2>
+                <p class="desc">// Quick feedback sounds for user interfaces</p>
+                <div class="button-grid">
+                    <button class="btn ui-sound" onclick="ToneLib.ping()">Ping</button>
+                    <button class="btn ui-sound" onclick="ToneLib.bell()">Bell</button>
+                    <button class="btn ui-sound" onclick="ToneLib.success()">Success</button>
+                    <button class="btn ui-sound" onclick="ToneLib.error()">Error</button>
+                    <button class="btn ui-sound" onclick="ToneLib.click()">Click</button>
+                    <button class="btn ui-sound" onclick="ToneLib.warning()">Warning</button>
+                    <button class="btn ui-sound" onclick="ToneLib.notify()">Notify</button>
+                    <button class="btn ui-sound" onclick="ToneLib.pop()">Pop</button>
+                    <button class="btn ui-sound" onclick="ToneLib.zap()">Zap</button>
+                    <button class="btn ui-sound" onclick="ToneLib.ding()">Ding</button>
+                    <button class="btn ui-sound" onclick="ToneLib.buzz()">Buzz</button>
+                    <button class="btn ui-sound" onclick="ToneLib.swish()">Swish</button>
+                    <button class="btn ui-sound" onclick="ToneLib.blip()">Blip</button>
+                    <button class="btn ui-sound" onclick="ToneLib.swoosh()">Swoosh</button>
+                    <button class="btn ui-sound" onclick="ToneLib.bleep()">Bleep</button>
+                    <button class="btn ui-sound" onclick="ToneLib.pulse()">Pulse</button>
+                    <button class="btn ui-sound" onclick="ToneLib.shimmer()">Shimmer</button>
+                </div>
+            </div>
+
+            <!-- Melodies Section -->
+            <div class="section">
+                <h2>Melodies</h2>
+                <p class="desc">// Sequenced multi-note melodies and patterns</p>
+                <div class="button-grid">
+                    <button class="btn melody" onclick="ToneLib.playJingle()">Jingle</button>
+                    <button class="btn melody" onclick="ToneLib.playAscending()">Scale</button>
+                    <button class="btn melody" onclick="ToneLib.playMelody()">Twinkle</button>
+                    <button class="btn melody" onclick="ToneLib.playAlert()">Alert</button>
+                    <button class="btn melody" onclick="ToneLib.playFanfare()">Fanfare</button>
+                    <button class="btn melody" onclick="ToneLib.playMysterious()">Mystery</button>
+                    <button class="btn melody" onclick="ToneLib.playAscendingFast()">Fast Up</button>
+                    <button class="btn melody" onclick="ToneLib.playChord()">Chord</button>
+                    <button class="btn melody" onclick="ToneLib.playStaccato()">Staccato</button>
+                    <button class="btn melody" onclick="ToneLib.playFuturistic()">Futuristic</button>
+                    <button class="btn melody" onclick="ToneLib.playGlitch()">Glitch</button>
+                    <button class="btn melody" onclick="ToneLib.playBeam()">Beam</button>
+                    <button class="btn melody" onclick="ToneLib.playPortal()">Portal</button>
+                    <button class="btn melody" onclick="ToneLib.playData()">Data</button>
+                </div>
+            </div>
+
+            <!-- Alarms Section -->
+            <div class="section">
+                <h2>Looped Alarms</h2>
+                <p class="desc">// Continuous alarm patterns</p>
+                
+                <div class="alarm-controls">
+                    <label>Pattern:</label>
+                    <select id="alarmPattern">
+                        <option value="beep">Beep</option>
+                        <option value="buzz">Buzz</option>
+                        <option value="siren">Siren</option>
+                        <option value="chirp">Chirp</option>
+                        <option value="whoop">Whoop</option>
+                    </select>
+                    
+                    <label>Interval (ms):</label>
+                    <input type="number" id="alarmInterval" value="1000" min="200" max="5000" step="100">
+                    
+                    <label>Volume:</label>
+                    <input type="range" id="alarmVolume" min="0.1" max="0.5" step="0.05" value="0.2">
+                    <span id="volumeDisplay">0.2</span>
+                </div>
+
+                <div class="button-grid">
+                    <button class="btn alarm-btn" onclick="startCustomAlarm()">Start Alarm</button>
+                    <button class="btn stop-alarm" onclick="ToneLib.stopAllAlarms()">Stop All</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ringtones & Alarms Section -->
+        <div class="section" style="margin-bottom: 30px;">
+            <h2>Ringtones & Alarms</h2>
+            <p class="desc">// Premade ringtones and alarm sounds</p>
+            <div class="button-grid">
+                <button class="btn melody" onclick="ToneLib.playRingtone('classic')">Classic</button>
+                <button class="btn melody" onclick="ToneLib.playRingtone('soft')">Soft</button>
+                <button class="btn melody" onclick="ToneLib.playRingtone('upbeat')">Upbeat</button>
+                <button class="btn melody" onclick="ToneLib.playRingtone('retro')">Retro</button>
+                <button class="btn melody" onclick="ToneLib.playRingtone('calm')">Calm</button>
+                <button class="btn melody" onclick="ToneLib.playRingtone('happy')">Happy</button>
+                <button class="btn melody" onclick="ToneLib.playPhaser()">Phaser</button>
+                <button class="btn melody" onclick="ToneLib.playRadar()">Radar</button>
+                <button class="btn melody" onclick="ToneLib.playTelephone()">Telephone</button>
+                <button class="btn melody" onclick="ToneLib.playNotification()">Notification</button>
+            </div>
+        </div>
+
+        <!-- Quick Guide Section -->
+        <div class="quick-test">
+            <h2>Quick Guide</h2>
+            <p class="desc">// How to use ToneLib in your projects</p>
+            
+            <div style="color: #888; font-size: 0.85em; line-height: 1.8;">
+                <p style="margin-bottom: 15px;"><strong style="color: #0f0;">UI Sounds:</strong> Simple feedback sounds for user interactions (ToneLib.ping(), ToneLib.success(), etc.)</p>
+                
+                <p style="margin-bottom: 15px;"><strong style="color: #0f0;">Melodies:</strong> Sequenced patterns for notifications or alerts (ToneLib.playJingle(), ToneLib.playAlert(), etc.)</p>
+                
+                <p style="margin-bottom: 15px;"><strong style="color: #0f0;">Looped Alarms:</strong> Continuous alarms with custom patterns, intervals, and volume (ToneLib.startAlarm('name', 'pattern', interval, volume))</p>
+                
+                <p style="margin-bottom: 15px;"><strong style="color: #0f0;">Ringtones:</strong> Premade phone-style sounds (ToneLib.playRingtone('classic'), ToneLib.playTelephone(), etc.)</p>
+                
+                <p style="margin-top: 20px; border-top: 1px solid #333; padding-top: 15px;">
+                    <strong style="color: #0f0;">// Basic Usage:</strong><br>
+                    <code style="color: #888;">ToneLib.ping();        // Quick sound</code><br>
+                    <code style="color: #888;">ToneLib.playJingle();  // Sequence</code><br>
+                    <code style="color: #888;">ToneLib.startAlarm('myAlarm', 'beep', 1000, 0.2);  // Loop</code>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="toneLib.js"></script>
+    <script>
+        // Volume slider display
+        document.getElementById('alarmVolume').addEventListener('input', function(e) {
+            document.getElementById('volumeDisplay').textContent = e.target.value;
+        });
+
+        // Start custom alarm
+        function startCustomAlarm() {
+            const pattern = document.getElementById('alarmPattern').value;
+            const interval = parseInt(document.getElementById('alarmInterval').value);
+            const volume = parseFloat(document.getElementById('alarmVolume').value);
+            
+            ToneLib.startAlarm('demo', pattern, interval, volume);
+        }
+
+        // Auto-resume audio context on first interaction (required by browsers)
+        let audioContextResumed = false;
+        document.addEventListener('click', function() {
+            if (!audioContextResumed) {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                if (ctx.state === 'suspended') {
+                    ctx.resume();
+                }
+                audioContextResumed = true;
+            }
+        }, { once: true });
+    </script>
+</body>
+</html>
